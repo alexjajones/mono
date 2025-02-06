@@ -1,0 +1,2 @@
+run:
+	java main.java
