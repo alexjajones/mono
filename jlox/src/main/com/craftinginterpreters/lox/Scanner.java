@@ -78,7 +78,8 @@ class Scanner {
 				break;
 			case '/':
 				if (match('/')) {
-					while(peek() != '\n' && !isAtEnd()) advance();
+					while (peek() != '\n' && !isAtEnd())
+						advance();
 				} else {
 					addToken(SLASH);
 				}
@@ -89,6 +90,9 @@ class Scanner {
 				break;
 			case '\n':
 				line++;
+				break;
+			case '"':
+				string();
 				break;
 			default:
 				Lox.error(line, "Unexpected character");
@@ -124,7 +128,27 @@ class Scanner {
 	}
 
 	private char peek() {
-		if (isAtEnd()) return '\0';
+		if (isAtEnd())
+			return '\0';
 		return source.charAt(current);
+	}
+
+	private void string() {
+		while (peek() != '"' && !isAtEnd()) {
+			if (peek() == '\n') {
+				line++;
+			}
+			advance();
+		}
+
+		if (isAtEnd()) {
+			Lox.error(line, "Unterminated string");
+			return;
+		}
+
+		advance();
+
+		String value = source.substring(start + 1, current - 1);
+		addToken(STRING, value);
 	}
 }
