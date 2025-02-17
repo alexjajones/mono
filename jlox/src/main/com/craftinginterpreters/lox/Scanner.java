@@ -14,6 +14,27 @@ class Scanner {
 	private int start = 0; // first char in lexeme being scanned
 	private int current = 0; // char being considered for lexeme
 	private int line = 1;
+	private static final Map<String, TokenType> keywords;
+
+	static {
+		keywords = new HashMap<>();
+		keywords.put("and", AND);
+		keywords.put("class", CLASS);
+		keywords.put("else", ELSE);
+		keywords.put("false", FALSE);
+		keywords.put("for", FOR);
+		keywords.put("fun", FUN);
+		keywords.put("if", IF);
+		keywords.put("nil", NIL);
+		keywords.put("or", OR);
+		keywords.put("print", PRINT);
+		keywords.put("return", RETURN);
+		keywords.put("super", SUPER);
+		keywords.put("this", THIS);
+		keywords.put("true", TRUE);
+		keywords.put("var", VAR);
+		keywords.put("while", WHILE);
+	}
 
 	Scanner(String source) {
 		this.source = source;
@@ -97,6 +118,8 @@ class Scanner {
 			default:
 				if (isDigit(c)) {
 					number();
+				} else if (isAlpha(c)) {
+					identifier();
 				} else {
 					Lox.error(line, "Unexpected character");
 				}
@@ -166,6 +189,12 @@ class Scanner {
 		return c >= '0' && c <= '9';
 	}
 
+	private boolean isAlpha(char c) {
+		return (c >= 'a' && c <= 'z') ||
+				(c >= 'A' && c <= 'Z') ||
+				c == '_';
+	}
+
 	private void number() {
 		while (isDigit(peek())) {
 			advance();
@@ -180,5 +209,17 @@ class Scanner {
 		}
 
 		addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+	}
+
+	private void identifier() {
+		while (isAlpha(peek())) {
+			advance();
+		}
+
+		String value = source.substring(start, current);
+		TokenType type = keywords.get(value);
+		if (type == null)
+			type = IDENTIFIER;
+		addToken(type);
 	}
 }
