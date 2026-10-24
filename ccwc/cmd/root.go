@@ -11,6 +11,7 @@ import (
 var (
 	showBytes bool
 	showLines bool
+	showWords bool
 )
 
 var RootCmd = &cobra.Command{
@@ -23,6 +24,7 @@ var RootCmd = &cobra.Command{
 func init() {
 	RootCmd.Flags().BoolVarP(&showBytes, "c", "c", false, "Show bytes")
 	// RootCmd.Flags().BoolVarP(&showLines, "l", "l", false, "Show bytes")
+	RootCmd.Flags().BoolVarP(&showWords, "w", "w", false, "Show word count")
 }
 
 func argValidate(cmd *cobra.Command, args []string) error {
@@ -52,6 +54,14 @@ func runCommand(cmd *cobra.Command, args []string) {
 
 	if showBytes {
 		logStr += strconv.FormatInt(stats.Size(), 10)
+	}
+	if showWords {
+		count, err := countWords(f)
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
+		logStr += strconv.Itoa(count) + " "
 	}
 	logStr += "	" + fileName
 
